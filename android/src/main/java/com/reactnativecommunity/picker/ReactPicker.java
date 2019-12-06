@@ -24,10 +24,16 @@ public class ReactPicker extends AppCompatSpinner {
   private @Nullable Integer mPrimaryColor;
   private @Nullable OnSelectListener mOnSelectListener;
   private @Nullable Integer mStagedSelection;
+  private AdapterView<?> lastParent;
+  private View lastView;
+  private long lastId;
 
   private final OnItemSelectedListener mItemSelectedListener = new OnItemSelectedListener() {
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+      lastParent = parent;
+      lastView = view;
+      lastId = id;
       if (mOnSelectListener != null) {
         mOnSelectListener.onItemSelected(position);
       }
@@ -109,6 +115,16 @@ public class ReactPicker extends AppCompatSpinner {
 
   @Nullable public OnSelectListener getOnSelectListener() {
     return mOnSelectListener;
+  }
+
+  @Override
+  public void setSelection(int position) {
+    if (position == getSelectedItemPosition() && mItemSelectedListener != null) {
+        mItemSelectedListener.onItemSelected(lastParent, lastView, position, lastId);
+    } else {
+        super.setSelection(position);
+    }
+
   }
 
   /**
